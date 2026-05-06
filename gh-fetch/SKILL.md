@@ -18,7 +18,11 @@ curl -s "https://cdn.jsdelivr.net/gh/{owner}/{repo}@{branch}/{path}"
 ## Subfolder
 
 ```bash
-npx degit {owner}/{repo}/{path} /tmp/{name}
+# Call 1 — fetch (npx download + clone can be slow; split for visibility)
+npx degit {owner}/{repo}/{path} /tmp/{name} --force
+
+# Call 2 — verify
+find /tmp/{name} -type f | sort
 ```
 
 ## Whole repo
