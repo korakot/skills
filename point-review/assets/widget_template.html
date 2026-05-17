@@ -1,0 +1,174 @@
+<!--
+  point-review widget template.
+
+  How to use: copy this entire file into the `widget_code` argument of
+  `mcp__visualize__show_widget`. Then replace the REVIEW_DATA constant below
+  with your actual rows, and adjust ACTION_LABELS / REVIEW_TOPIC as needed.
+
+  Do not change the toggle colors (TOGGLE_COLORS) — they are the proven
+  values that work in both light and dark mode.
+-->
+
+<h2 class="sr-only">Per-point review — accept, reject, or skip each item; leave optional comments; submit the batch.</h2>
+<div style="padding: 1rem 0;">
+  <div id="pr-legend" style="font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 16px;"></div>
+  <div id="rows-host"></div>
+  <div style="margin-top: 1rem;">
+    <label for="pr-overall" style="display: block; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px;">Overall comment (optional) — meta-feedback that doesn't belong on any single row</label>
+    <textarea id="pr-overall" rows="3" placeholder="e.g. several of these phrases describe what the skill does, not when to use it" style="width: 100%; resize: vertical;"></textarea>
+  </div>
+  <div style="display: flex; gap: 8px; align-items: center; margin-top: 1rem;">
+    <button type="button" id="pr-submit">Submit ↗</button>
+    <span id="pr-status" style="font-size: 13px; color: var(--color-text-secondary);"></span>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  // === EDIT THIS BLOCK ===
+
+  const REVIEW_TOPIC = "your review topic here";
+
+  // Three action slots. Order matters — slot 0 = positive, slot 1 = negative, slot 2 = defer.
+  // Pick labels that fit the review type (Accept/Reject/Skip, Resolve/Drop/Keep, Include/Exclude/Maybe, etc.).
+  const ACTION_LABELS = ["Accept", "Reject", "Skip"];
+
+  // One-line description per action, used to render the inline legend. Required —
+  // verb labels alone don't always convey what the action does.
+  const ACTION_DESCRIPTIONS = [
+    "take the claim as stated",
+    "drop the claim",
+    "defer; revisit later"
+  ];
+
+  // Each row: { title, context, tag, default }
+  // - title (required): short claim text
+  // - context (optional): 1–2 lines of supporting detail
+  // - tag (optional): provenance chip text, e.g. "sourced · 2026-05-12"
+  // - default (optional): index into ACTION_LABELS to pre-select (0/1/2). Usually omit.
+  const REVIEW_DATA = [
+    { title: "First claim", context: "Why this claim matters in one line.", tag: "sourced" },
+    { title: "Second claim", context: "Supporting context.", tag: "reasoning" }
+  ];
+
+  // === DO NOT EDIT BELOW (visual contract) ===
+
+  const TOGGLE_COLORS = ["#0F6E56", "#A32D2D", "#5F5E5A"]; // teal-600, red-600, gray-600
+
+  const host = document.getElementById("rows-host");
+  const legend = document.getElementById("pr-legend");
+  ACTION_LABELS.forEach((label, i) => {
+    const piece = document.createElement("span");
+    piece.style.cssText = "display: inline-flex; align-items: center;";
+    const dot = document.createElement("span");
+    dot.style.cssText = "display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: " + TOGGLE_COLORS[i] + "; margin-right: 6px;";
+    const text = document.createElement("span");
+    text.innerHTML = "<strong style='font-weight: 500; color: var(--color-text-secondary);'>" + label + "</strong> — " + ACTION_DESCRIPTIONS[i];
+    piece.appendChild(dot);
+    piece.appendChild(text);
+    legend.appendChild(piece);
+  });
+
+  function makeRow(item, idx){
+    const wrap = document.createElement("div");
+    wrap.className = "pr-row";
+    wrap.dataset.idx = idx;
+    wrap.style.cssText = "padding: 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); margin-bottom: 8px;";
+
+    const title = document.createElement("div");
+    title.style.cssText = "font-size: 14px; font-weight: 500; margin-bottom: 4px;";
+    title.textContent = item.title;
+    wrap.appendChild(title);
+
+    if (item.context) {
+      const ctx = document.createElement("div");
+      ctx.style.cssText = "font-size: 13px; color: var(--color-text-secondary); line-height: 1.5;";
+      ctx.textContent = item.context;
+      wrap.appendChild(ctx);
+    }
+
+    if (item.tag) {
+      const tagWrap = document.createElement("div");
+      tagWrap.style.cssText = "margin-top: 6px;";
+      const tag = document.createElement("span");
+      tag.style.cssText = "font-size: 11px; padding: 2px 8px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); color: var(--color-text-secondary);";
+      tag.textContent = item.tag;
+      tagWrap.appendChild(tag);
+      wrap.appendChild(tagWrap);
+    }
+
+    const footer = document.createElement("div");
+    footer.style.cssText = "display: flex; gap: 12px; align-items: center; margin-top: 10px; flex-wrap: wrap;";
+
+    const comment = document.createElement("input");
+    comment.type = "text";
+    comment.placeholder = "Optional note / resolution";
+    comment.className = "pr-comment";
+    comment.style.cssText = "flex: 1; min-width: 200px;";
+    footer.appendChild(comment);
+
+    const actions = document.createElement("div");
+    actions.className = "pr-actions";
+    actions.style.cssText = "display: flex; gap: 6px; flex-shrink: 0;";
+
+    ACTION_LABELS.forEach((label, ai) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = label;
+      btn.dataset.actionIdx = ai;
+      btn.addEventListener("click", () => selectAction(btn));
+      actions.appendChild(btn);
+    });
+    footer.appendChild(actions);
+    wrap.appendChild(footer);
+
+    if (typeof item.default === "number") {
+      const target = actions.children[item.default];
+      if (target) selectAction(target);
+    }
+
+    return wrap;
+  }
+
+  function selectAction(btn){
+    const group = btn.parentElement;
+    group.querySelectorAll("button").forEach(b => {
+      b.style.background = "transparent";
+      b.style.color = "var(--color-text-secondary)";
+      b.style.border = "0.5px solid var(--color-border-tertiary)";
+      b.style.fontWeight = "400";
+      b.dataset.selected = "false";
+      const ic = b.querySelector(".ti-check");
+      if (ic) ic.remove();
+    });
+    const c = TOGGLE_COLORS[Number(btn.dataset.actionIdx)];
+    btn.style.background = c;
+    btn.style.color = "#ffffff";
+    btn.style.border = "0.5px solid " + c;
+    btn.style.fontWeight = "500";
+    btn.dataset.selected = "true";
+    btn.insertAdjacentHTML("afterbegin", '<i class="ti ti-check" style="margin-right:4px;font-size:14px;vertical-align:-1px;" aria-hidden="true"></i>');
+  }
+
+  REVIEW_DATA.forEach((item, i) => host.appendChild(makeRow(item, i)));
+
+  document.getElementById("pr-submit").addEventListener("click", () => {
+    const rows = document.querySelectorAll(".pr-row");
+    const lines = [];
+    rows.forEach((r) => {
+      const idx = Number(r.dataset.idx);
+      const item = REVIEW_DATA[idx];
+      const sel = r.querySelector("button[data-selected='true']");
+      const action = sel ? ACTION_LABELS[Number(sel.dataset.actionIdx)].toUpperCase() : "NONE";
+      const comment = r.querySelector(".pr-comment").value.trim();
+      lines.push(`- [${action}] ${item.title} | Comment: ${comment || "(none)"}`);
+    });
+    const overall = document.getElementById("pr-overall").value.trim();
+    const overallBlock = overall ? `\n\nOverall comment:\n${overall}` : "";
+    document.getElementById("pr-status").textContent = "Submitted.";
+    sendPrompt(`Review of ${REVIEW_TOPIC}:\n${lines.join("\n")}${overallBlock}`);
+  });
+
+})();
+</script>
