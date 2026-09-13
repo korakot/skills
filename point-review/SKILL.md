@@ -5,7 +5,7 @@ description: Use when 3+ items each need a decision — claim-by-claim synthesis
 
 # point-review
 
-A per-point review widget: the user accepts or rejects each of a set of claims, leaves per-point notes and one overall comment, and submits the whole batch back as structured text you fold into the next step.
+A per-point review widget: the user decides on each of a set of claims, leaves per-point notes and one overall comment, and submits the whole batch back as structured text you fold into the next step.
 
 ## Why this exists: gen-verify
 
@@ -19,6 +19,7 @@ You are about to produce, or have just produced, multi-point synthesis — anyth
 - A comparison of 5 options — they may want a few rows kept and a few dropped.
 - A batch of backlog items to triage (resolve / drop).
 - A recommendation list where each item has different evidence quality.
+- A pile of items to sort into categories (now / later / never), which the same widget handles with category labels instead of verbs.
 - A claim-by-claim review of synthesis you generated earlier in the chat.
 
 When in doubt: if the next step is "user reads a list of claims and reacts to each", use this skill. Long prose with claims buried inside is the wrong shape — surface them in rows.
@@ -38,7 +39,7 @@ Third point
 
 - One line per point: `title | context | tag`. Context and tag are optional; `#` starts a comment line.
 - `topic` names the review; it comes back in the submission header.
-- `acts` picks the verb pair — a preset name (`claims` default, `triage`, `select`, `code`, see table below) or a custom `Label:description|Label:description`. The description is what the legend shows, so write it as what the action *does*.
+- `acts` sets the buttons — a preset name (`claims` default, `triage`, `select`, `code`, see table below) or a custom `Label:description|…` with two to four of them. The description is what the legend shows, so write it as what the choice *means*.
 - Pipes separate fields, so keep `|` out of the text. The block is HTML: escape `<` and `&` as entities.
 - Rows start unselected and stay optional: a point left unclicked submits as `SKIP`, and its note still comes through. Clicking the selected button again unselects it.
 
@@ -59,26 +60,26 @@ Overall comment:
 
 Per row: take the action (resolve → write the resolution back to the source, drop → remove the item). The comment is the user's note; when the action was Resolve, the comment often *is* the resolution and belongs wherever the item lives.
 
-`[SKIP]` is the third channel, not an empty row. With no note, the user deferred it — leave it in place and don't ask. With a note, the note *is* the response: a correction, a question, a "not as written" — read it as the point's verdict and act on the note rather than on a verb.
+`[SKIP]` is its own channel, not an empty row. With no note, the user deferred it — leave it in place and don't ask. With a note, the note *is* the response: a correction, a question, a "not as written" — act on the note rather than waiting for a verb.
 
 The **Overall comment** block appears only when non-empty, and it is where structural problems surface ("several of these phrases describe what the skill does, not when to use it"). Address it explicitly and let it shape the next iteration.
 
 Confirm what you did in chat, briefly. Don't re-render the widget unless asked.
 
-## Verb presets
+## Presets and custom labels
 
-| Preset | Positive (teal) | Negative (red) |
+| Preset | Slot 1 (teal) | Slot 2 (red) |
 |---|---|---|
 | `claims` (default) | Accept — take the claim as stated | Reject — drop the claim |
 | `triage` | Resolve — close now; comment becomes resolution | Drop — stop tracking |
 | `select` | Include — ship this option | Exclude — leave out |
 | `code` | Apply — merge this change | Discard — close without merging |
 
-A defer verb has no slot: leaving a row unclicked already means defer, so a third button would only be a slower way to say nothing.
+The presets are pairs; a custom `acts` takes two to four. Use three or four when the review sorts items into categories rather than approving them — `Now:this sprint|Later:next quarter|Never:drop it` — and keep the strongest option in slot 1, since slot colors run teal, red, gray, blue regardless of label. A defer slot is never needed: an unclicked row already means defer.
 
 ## Anti-patterns
 
-**Two actions, always.** pr.js takes the first two labels and drops the rest; more buttons make rows wider, harder to scan and harder to commit to.
+**Four buttons is the ceiling.** pr.js takes the first four labels and drops the rest; beyond that, rows get wide, scanning slows, and committing gets harder. If the choice genuinely has more branches, split the review or ask the question a different way.
 
 **Keep context to 1–2 lines.** A point needing more explanation belongs in its own chat or document, not in a batch review.
 
