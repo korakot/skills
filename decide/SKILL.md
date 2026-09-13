@@ -39,7 +39,9 @@ Third point
 
 - One line per point: `title | context | tag`. Context and tag are optional; `#` starts a comment line.
 - `topic` names the review; it comes back in the submission header.
-- `acts` sets the buttons — a preset name (`claims` default, `triage`, `select`, `code`, see table below) or a custom `Label:description|…` with two to four of them. The description is what the legend shows, so write it as what the choice *means*.
+- `acts` sets the buttons — a preset name (`claims` default, `triage`, `select`, `code`, see table below) or a custom list of two to four labels separated by `|`, e.g. `Now|Later|Never`. The legend shows a colored dot and the label, nothing more, so each label has to carry its own meaning.
+- `lang="th"` / `lang="en"` sets the language of the widget's own copy (preset labels, placeholder, hint, Submit). Leave it off and the widget auto-detects: Thai if Thai characters appear in `topic` or the rows, English otherwise — so a Thai review normally needs no attribute. Set it explicitly when the rows are Thai but you want English buttons, or vice versa. One language applies to the whole widget.
+- Write the rows in the user's language. The widget follows the rows, so mixing a Thai topic with English points produces a mismatched UI.
 - Pipes separate fields, so keep `|` out of the text. The block is HTML: escape `<` and `&` as entities.
 - Rows start unselected and stay optional. Clicking the selected button again unselects it. An unclicked row with a note in it comes back as-is (the note carries the decision — no `SKIP` tag is stamped on it); an unclicked row left completely untouched is folded into one trailing `[SKIP]` line at the end of the batch, so a mostly-untouched review doesn't cost one line per row.
 - Multiple `<pre class="decide">` blocks in one widget share a single Submit button (same convention as `ask.js`) — use this if you need more than one batch of rows reviewed before the next step.
@@ -65,20 +67,22 @@ Three line shapes, by how the row was left:
 - **`title | note`** (no bracket, no verb) — nothing was clicked but the row has a note. The note itself is the response — a correction, a question, a "not as written" — act on it directly rather than treating it as skipped.
 - **`[SKIP] title, title, ...`** — one compressed line listing every row that was left completely untouched (no click, no note). The user deferred these — leave them in place and don't ask about them individually.
 
+The structural keys (`Review of`, `Comment:`, `(none)`, `[SKIP]`, `Overall comment:`) are always English, whatever the widget's language. `ACTION` is the button label itself, so a Thai review returns `[ยอมรับ]`, `[ปฏิเสธ]`, `[แก้แล้ว]`, `[ทิ้ง]`, and so on — map the label back to the preset, not to an English verb.
+
 The **Overall comment** block appears only when non-empty, and it is where structural problems surface ("several of these phrases describe what the skill does, not when to use it"). Address it explicitly and let it shape the next iteration.
 
 Confirm what you did in chat, briefly. Don't re-render the widget unless asked.
 
 ## Presets and custom labels
 
-| Preset | Slot 1 (teal) | Slot 2 (red) |
-|---|---|---|
-| `claims` (default) | Accept — take the claim as stated | Reject — drop the claim |
-| `triage` | Resolve — close now; comment becomes resolution | Drop — stop tracking |
-| `select` | Include — ship this option | Exclude — leave out |
-| `code` | Apply — merge this change | Discard — close without merging |
+| Preset | Slot 1 (teal) | Slot 2 (red) | Means |
+|---|---|---|---|
+| `claims` (default) | Accept / ยอมรับ | Reject / ปฏิเสธ | take the claim as stated vs drop it |
+| `triage` | Resolve / แก้แล้ว | Drop / ทิ้ง | close now, comment becomes the resolution vs stop tracking |
+| `select` | Include / รวม | Exclude / ไม่รวม | ship this option vs leave it out |
+| `code` | Apply / ใช้ | Discard / ทิ้ง | merge this change vs close without merging |
 
-The presets are pairs; a custom `acts` takes two to four. Use three or four when the review sorts items into categories rather than approving them — `Now:this sprint|Later:next quarter|Never:drop it` — and keep the strongest option in slot 1, since slot colors run teal, red, gray, blue regardless of label. A defer slot is never needed: an unclicked row already means defer.
+The "Means" column is for your preset choice — it is not shown in the UI. The presets are pairs; a custom `acts` takes two to four labels. Use three or four when the review sorts items into categories rather than approving them — `Now|Later|Never` — and keep the strongest option in slot 1, since slot colors run teal, red, gray, blue regardless of label. A defer slot is never needed: an unclicked row already means defer.
 
 ## Anti-patterns
 
@@ -87,5 +91,7 @@ The presets are pairs; a custom `acts` takes two to four. Use three or four when
 **Keep context to 1–2 lines.** A point needing more explanation belongs in its own chat or document, not in a batch review.
 
 **Render rows, not a prose checklist.** Inline checkboxes in prose are slower to scan and capture no notes.
+
+**Don't re-explain the UI in your chat text.** The legend already says the buttons are optional; a paragraph telling the user how to use the widget is the redundancy the copy was trimmed to avoid.
 
 **Hand-written review HTML is the old shape.** Everything visual is in decide.js now; emitting your own rows means a second copy that drifts.
