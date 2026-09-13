@@ -22,13 +22,14 @@ Call `mcp__visualize__show_widget` in HTML mode — the review is ephemeral, not
 ```html
 <script src="https://cdn.jsdelivr.net/gh/korakot/ui@main/decide.js"></script>
 <pre class="decide" topic="skill descriptions" acts="claims">
-Title of the point | one line of context | sourced · 2026-05-12
-Second point | context, 1–2 lines at most | reasoning
+Title of the point | one line of context
+Second point | context, 1–2 lines at most
 Third point
 </pre>
 ```
 
-- One line per point: `title | context | tag`. Context and tag are optional; `#` comments a line out. Keep `|` out of the text, and escape `<` and `&`.
+- One line per point: `title | context` — the same two-field shape as ask.js. Context is optional and is everything after the first `|`; `#` comments a line out; escape `<` and `&`.
+- Don't add a third field. If provenance matters for a particular row, lead the context with it (`inferred: …`); when every row shares a source, say nothing.
 - `topic` names the review and comes back in the submission header.
 - `acts` — a preset (`claims` default, `triage`, `select`, `code`) or two to four custom labels, e.g. `Now|Later|Never`. The legend shows a colored dot and the label, nothing else, so each label has to carry its own meaning. Slot colors run teal, red, gray, blue — strongest option first.
 - `lang="th"` / `lang="en"` sets the widget's own copy; omit it and Thai is detected from the topic and rows. Write the rows in the user's language and the UI follows.
