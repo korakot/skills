@@ -49,11 +49,19 @@ Third point
 - Context length has one test: could the reader decide this row without asking a follow-up? If not, it is too short. A few sentences is normal — what the claim rests on, what changes if accepted, what the alternative was. Thin context is the main reason reviews stall. If the explanation wants formatting or a picture, move that point to rich mode.
 - Don't add a third field. If provenance matters for a particular row, lead the context with it (`inferred: …`); when every row shares a source, say nothing.
 - Pick granularity by what is being decided: one diagram with one verdict when the whole is the decision; several small points when the parts are.
+- Style rich content so it reads as a body, not loose text. A table needs hairline row borders and a muted label column:
+
+  ```html
+  <table style="width:100%;font-size:13px;border-collapse:collapse">
+    <tr style="border-bottom:0.5px solid var(--border)"><td style="padding:6px 0;color:var(--text-secondary)">Label</td><td style="padding:6px 0">Value</td></tr>
+  </table>
+  ```
 - `topic` names the review and comes back in the submission header.
 - `acts` — a preset (`claims` default, `triage`, `select`, `code`) or two to four custom labels, e.g. `Now|Later|Never`. The legend shows a colored dot and the label, nothing else, so each label has to carry its own meaning. Slot colors run teal, red, gray, blue — strongest option first.
 - `lang="th"` / `lang="en"` sets the widget's own copy; omit it and Thai is detected from the topic and rows. Write the rows in the user's language and the UI follows.
 - Every button is optional, and an untouched row means defer. Each row has an Explain ↗ button that sends `Explain this point: <title> (review of <topic>)` to chat — answer it and let the user return to the open review; don't re-render.
 - Everything in one widget shares a single Submit; points are grouped into sections by `topic`.
+- Testing right after a push to `korakot/ui`: load `points.js` by commit SHA (`@<sha>/points.js`), not `@main` — a browser that fetched `@main` minutes earlier reuses it, and a stale build looks like broken code (rich rows render with no footer).
 
 | Preset | Slot 1 | Slot 2 |
 |---|---|---|
