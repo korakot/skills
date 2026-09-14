@@ -17,24 +17,43 @@ Wrong shape: one or two items, a single narrative, or a request for your final a
 
 ## Render it
 
-Call `mcp__visualize__show_widget` in HTML mode — the review is ephemeral, not a Live Artifact:
+Call `mcp__visualize__show_widget` in HTML mode — the review is ephemeral, not a Live Artifact. Two input forms, one widget:
+
+**Rich mode** — the default for anything non-trivial. Any element with a `review` attribute becomes a point; its content is whatever makes the judgment easiest — a paragraph, a table, a `mm.js` / `cy.js` diagram (load that script too). `title` is the short decidable statement; `topic` and `acts` sit on a wrapper and are inherited.
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/korakot/ui@main/points.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/korakot/ui@main/mm.js"></script>
+<div topic="auth redesign" acts="claims">
+  <div review title="Token refresh matches the spec">
+    <pre class="mm">sequenceDiagram; Client->>Server: refresh; Server-->>Client: 200</pre>
+  </div>
+  <div review title="Latency budget is realistic">
+    <p>Measured p95 is 180 ms against a 250 ms budget; the 70 ms headroom covers the extra hop.</p>
+  </div>
+</div>
+```
+
+**Line mode** — shorthand for atomic items (rename this, drop that):
 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/korakot/ui@main/points.js"></script>
 <pre class="points" topic="skill descriptions" acts="claims">
 Title of the point | one line of context
-Second point | context, 1–2 lines at most
+Second point | context — as much as the reader needs to decide
 Third point
 </pre>
 ```
 
-- One line per point: `title | context` — the same two-field shape as ask.js. Context is optional and is everything after the first `|`; `#` comments a line out; escape `<` and `&`.
+- One line per point: `title | context` — the same two-field shape as ask.js. Context is everything after the first `|`; `#` comments a line out; escape `<` and `&`.
+- Context length has one test: could the reader decide this row without asking a follow-up? If not, it is too short. A few sentences is normal — what the claim rests on, what changes if accepted, what the alternative was. Thin context is the main reason reviews stall. If the explanation wants formatting or a picture, move that point to rich mode.
 - Don't add a third field. If provenance matters for a particular row, lead the context with it (`inferred: …`); when every row shares a source, say nothing.
+- Pick granularity by what is being decided: one diagram with one verdict when the whole is the decision; several small points when the parts are.
 - `topic` names the review and comes back in the submission header.
 - `acts` — a preset (`claims` default, `triage`, `select`, `code`) or two to four custom labels, e.g. `Now|Later|Never`. The legend shows a colored dot and the label, nothing else, so each label has to carry its own meaning. Slot colors run teal, red, gray, blue — strongest option first.
 - `lang="th"` / `lang="en"` sets the widget's own copy; omit it and Thai is detected from the topic and rows. Write the rows in the user's language and the UI follows.
-- Every button is optional, and an untouched row means defer.
-- Several `<pre class="points">` blocks in one widget share a single Submit — use that when two batches need reviewing before the next step.
+- Every button is optional, and an untouched row means defer. Each row has an Explain ↗ button that sends `Explain this point: <title> (review of <topic>)` to chat — answer it and let the user return to the open review; don't re-render.
+- Everything in one widget shares a single Submit; points are grouped into sections by `topic`.
 
 | Preset | Slot 1 | Slot 2 |
 |---|---|---|
@@ -64,6 +83,6 @@ The keys are always English; `ACTION` is the button label itself, so a Thai revi
 
 ## Keep in mind
 
-Four buttons is the ceiling — points.js drops the rest silently, so split the review instead. The legend already says the buttons are optional, so don't re-explain the widget in your chat text. And never hand-write review HTML: everything visual lives in points.js, and a second copy drifts.
+Four buttons is the ceiling — points.js drops the rest silently, so split the review instead. The legend already says the buttons are optional, so don't re-explain the widget in your chat text. Never hand-write the footer or buttons: everything visual about the review lives in points.js, and a second copy drifts — rich mode is for the *content* of a point, not for redrawing the widget. Don't attach `review` to everything on the page: a footer only where a verdict is actually wanted back.
 
 Full widget spec: https://github.com/korakot/ui/blob/main/points.md
