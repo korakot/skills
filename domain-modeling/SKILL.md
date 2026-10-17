@@ -65,6 +65,8 @@ Once a term settles, write it right then rather than batching to the end of the 
 
 `GLOSSARY.md` should be totally devoid of implementation details. Do not treat `GLOSSARY.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
+The first time you create `GLOSSARY.md` in a repo, also add one pointer line to the repo's `AGENTS.md` (or `CLAUDE.md`), such as "Read `GLOSSARY.md` before working here: it defines this repo's terms", and, if the repo has a `wiki/index.md`, one line there linking the glossary. Other sessions and skills only read the glossary when something points them to it; upstream does that through `docs/agents/domain.md`, which these repos don't have.
+
 When a wiki page already explains the concept in depth, the glossary entry keeps only the tight definition and links that page. The page stays the one home for the detail; restating it in the glossary creates two copies that drift apart.
 
 ### Offer ADRs sparingly

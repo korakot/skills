@@ -19,3 +19,4 @@ File layout follows upstream (`GLOSSARY.md` at the repo root, ADRs in `docs/adr/
 5. **`_Also_` for other-language forms** (GLOSSARY-FORMAT.md, new rule and example). For Thai/English projects, an equivalent term in the other language is sanctioned, not to be avoided.
 6. **"General programming concepts" generalised to "general concepts of the field"** (GLOSSARY-FORMAT.md rules), since most of these repos aren't code.
 7. **Description** widened to wiki terminology and to defining or renaming a term, so it also triggers outside code work.
+8. **Pointer lines on first glossary** (SKILL.md, paragraph before "Link, don't restate"). Creating the first `GLOSSARY.md` also adds a line to `AGENTS.md`/`CLAUDE.md` and to `wiki/index.md`, standing in for upstream's `docs/agents/domain.md`, so other sessions find the glossary.
