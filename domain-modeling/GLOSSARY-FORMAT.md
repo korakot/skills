@@ -22,7 +22,7 @@ A person or organization that places orders.
 _Avoid_: Client, buyer, account
 
 **Anchor**:
-The source paragraph an index entry points into. See [alignment](./alignment.md).
+The source paragraph an index entry points into. See [alignment](./wiki/alignment.md).
 _Also_: จุดยึด
 ```
 
@@ -37,9 +37,9 @@ _Also_: จุดยึด
 
 ## Single vs multi-context repos
 
-**Single context (most repos):** One `GLOSSARY.md` beside the repo's entry point: `wiki/GLOSSARY.md` next to `wiki/index.md` in a wiki repo, the repo root otherwise.
+**Single context (most repos):** One `GLOSSARY.md` at the repo root.
 
-**Multiple contexts:** A `GLOSSARY-MAP.md` in that same place lists the contexts, where they live, and how they relate to each other:
+**Multiple contexts:** A `GLOSSARY-MAP.md` at the repo root lists the contexts, where they live, and how they relate to each other:
 
 ```md
 # Glossary Map
@@ -60,7 +60,7 @@ _Also_: จุดยึด
 The skill infers which structure applies:
 
 - If `GLOSSARY-MAP.md` exists, read it to find contexts
-- If only a single `GLOSSARY.md` exists, single context
-- If neither exists, create `GLOSSARY.md` beside the entry point lazily when the first term is settled
+- If only a root `GLOSSARY.md` exists, single context
+- If neither exists, create a root `GLOSSARY.md` lazily when the first term is resolved
 
 When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.

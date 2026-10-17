@@ -9,20 +9,7 @@ Actively build and sharpen the project's domain model as you design. This is the
 
 ## File structure
 
-The glossary sits beside the repo's own entry point, because that's where a reader (human or agent) starts. In a wiki repo that is `wiki/index.md`, so the glossary is `wiki/GLOSSARY.md`; in a code repo with no wiki it is the repo root.
-
-```
-/
-├── wiki/
-│   ├── index.md
-│   ├── GLOSSARY.md
-│   ├── adr/
-│   │   └── 0001-index-inversion-as-genre.md
-│   └── <topic pages>.md
-└── src/
-```
-
-Code repo with no wiki:
+Most repos have a single context:
 
 ```
 /
@@ -34,7 +21,7 @@ Code repo with no wiki:
 └── src/
 ```
 
-If a `GLOSSARY-MAP.md` exists beside the index, the repo has multiple contexts. The map points to where each one lives:
+If a `GLOSSARY-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
 
 ```
 /
@@ -50,7 +37,7 @@ If a `GLOSSARY-MAP.md` exists beside the index, the repo has multiple contexts. 
 │       └── docs/adr/
 ```
 
-Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is settled. If no ADR folder exists (`wiki/adr/` in a wiki repo, `docs/adr/` otherwise), create it when the first ADR is needed.
+Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
 
 ## During the session
 
