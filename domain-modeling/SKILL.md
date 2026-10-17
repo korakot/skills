@@ -1,15 +1,28 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR.
+description: Build and sharpen a project's domain model. Use when discussing a project's or wiki's terminology, defining or renaming a term, writing or editing a GLOSSARY.md, or recording or editing an ADR.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `GLOSSARY.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down once they crystallise. (Merely *reading* `GLOSSARY.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
 ## File structure
 
-Most repos have a single context:
+The glossary sits beside the repo's own entry point, because that's where a reader (human or agent) starts. In a wiki repo that is `wiki/index.md`, so the glossary is `wiki/GLOSSARY.md`; in a code repo with no wiki it is the repo root.
+
+```
+/
+├── wiki/
+│   ├── index.md
+│   ├── GLOSSARY.md
+│   ├── adr/
+│   │   └── 0001-index-inversion-as-genre.md
+│   └── <topic pages>.md
+└── src/
+```
+
+Code repo with no wiki:
 
 ```
 /
@@ -21,7 +34,7 @@ Most repos have a single context:
 └── src/
 ```
 
-If a `GLOSSARY-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+If a `GLOSSARY-MAP.md` exists beside the index, the repo has multiple contexts. The map points to where each one lives:
 
 ```
 /
@@ -37,7 +50,7 @@ If a `GLOSSARY-MAP.md` exists at the root, the repo has multiple contexts. The m
 │       └── docs/adr/
 ```
 
-Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is settled. If no ADR folder exists (`wiki/adr/` in a wiki repo, `docs/adr/` otherwise), create it when the first ADR is needed.
 
 ## During the session
 
@@ -53,15 +66,19 @@ When the user uses vague or overloaded terms, propose a precise canonical term. 
 
 When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
 
-### Cross-reference with code
+### Cross-reference with the repo
 
-When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
+When the user states how something works, check whether the repo agrees: the code, or the wiki pages that already describe the concept. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?" or "The alignment page uses 'anchor' for the source paragraph, but you're using it for the target. Which is it?"
 
-### Update GLOSSARY.md inline
+### Update GLOSSARY.md when a term settles
 
-When a term is resolved, update `GLOSSARY.md` right there. Don't batch these up: capture them as they happen. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
+A term is **settled** when the user states it plainly or accepts the term you proposed ("yes, call it X"). A term the user is still asking about ("is 'anchor' the right word?") is not settled: they want your view, so give it and wait. Writing while they are still weighing it hands them a file to check before they've decided anything.
+
+Once a term settles, write it right then rather than batching to the end of the session, so nothing is lost if the session stops. Then say in one line what you wrote ("Added **Anchor** to the glossary: the source paragraph an index entry points into"), so the user can check it without opening the file. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
 
 `GLOSSARY.md` should be totally devoid of implementation details. Do not treat `GLOSSARY.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+
+When a wiki page already explains the concept in depth, the glossary entry keeps only the tight definition and links that page. The page stays the one home for the detail; restating it in the glossary creates two copies that drift apart.
 
 ### Offer ADRs sparingly
 
@@ -71,4 +88,4 @@ Only offer to create an ADR when all three are true:
 2. **Surprising without context**: a future reader will wonder "why did they do it this way?"
 3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+If any of the three is missing, skip the ADR. If the decision was made on a wayfinder ticket, the ticket's resolution comment is already its record: link the ticket from the relevant wiki page instead of writing a second copy as an ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
