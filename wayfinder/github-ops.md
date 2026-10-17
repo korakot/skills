@@ -1,4 +1,4 @@
-# Tracker: GitHub issues
+# GitHub operations
 
 How this fork expresses the map's operations on GitHub. Adapted from upstream's `setup-matt-pocock-skills/issue-tracker-github.md` ("Wayfinding operations"), plus the parts upstream leaves to per-repo setup: which repo, the roster, and running from Claude Chat.
 

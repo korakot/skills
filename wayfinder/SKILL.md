@@ -22,7 +22,7 @@ The map is a single issue on this repo's issue tracker, labelled `wayfinder:map`
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place, its ticket, so the map never restates it, only gists it and links.
 
-**The tracker is GitHub issues.** Which repo a map lives in, the `gh`/MCP commands for each operation, and the roster that lists every map are in [TRACKER.md](TRACKER.md); read it before the first tracker write of a session.
+**The tracker is GitHub issues.** Which repo a map lives in, the `gh`/MCP commands for each operation, and the roster that lists every map are in [github-ops.md](github-ops.md); read it before the first tracker write of a session.
 
 ### The map body
 
@@ -108,12 +108,12 @@ Two modes. Either way, **never resolve more than one ticket per session**, with 
 
 User invokes with a loose idea.
 
-1. **Name the destination.** Call the Skill tool twice, for "grilling" and "domain-modeling", to pin down what this map is finding its way to: the spec, decision, or change. The destination fixes the scope, so it's settled first. While grilling, pick the **home repo** for the map (see [TRACKER.md](TRACKER.md)) and say which one early, so the user can correct it before anything is created.
+1. **Name the destination.** Call the Skill tool twice, for "grilling" and "domain-modeling", to pin down what this map is finding its way to: the spec, decision, or change. The destination fixes the scope, so it's settled first. While grilling, pick the **home repo** for the map (see [github-ops.md](github-ops.md)) and say which one early, so the user can correct it before anything is created.
 2. **Map the frontier.** Grill again, **breadth-first** this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. **If this surfaces no fog** (the way to the destination is already clear, the whole journey small enough for one session), you don't need a map. Stop and ask the user how they'd like to proceed.
 3. **Create the map** (label `wayfinder:map`): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
 4. **Create the tickets you can specify now** as child issues of the map, then wire blocking edges in a **second pass** (issues need ids before they can reference each other). Write cross-references in that pass too, with real ids: a placeholder `#<n>` auto-links to an unrelated issue. Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog: the **Not yet specified** section.
 5. **Fire the research tickets.** For each `research` ticket you just created, spin up a subagent to resolve it in parallel, or emit its launch link where there are no subagents (see Research under [Ticket Types](#ticket-types)).
-6. **Add the map to the roster**: one line, the map's name wrapping its link (see [TRACKER.md](TRACKER.md)). The roster is how a later session in another repo or another tool finds this map at all.
+6. **Add the map to the roster**: one line, the map's name wrapping its link (see [github-ops.md](github-ops.md)). The roster is how a later session in another repo or another tool finds this map at all.
 7. Stop: charting is one session's work; it hand-resolves nothing.
 
 ### Work through the map

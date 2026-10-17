@@ -16,7 +16,7 @@ User-invoked only:
 ## Files
 
 - [`SKILL.md`](SKILL.md): the method (upstream text plus marked divergences)
-- [`TRACKER.md`](TRACKER.md): GitHub operations, which repo a map lives in, the roster
+- [`github-ops.md`](github-ops.md): GitHub operations, which repo a map lives in, the roster
 - [`UPSTREAM.md`](UPSTREAM.md): synced-to commit, divergence list, how to update
 
 ## Install
