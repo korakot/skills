@@ -17,7 +17,7 @@ Wrong shape: one or two items, a single narrative, or a request for your final a
 
 ## Render it
 
-Call `mcp__visualize__show_widget` in HTML mode — the review is ephemeral, not a Live Artifact. Two input forms, one widget:
+Call `mcp__visualize__show_widget` in HTML mode (in Claude Code Projects the same inline widget tool is `post_widget`) — the review is ephemeral, not a Live Artifact. Two input forms, one widget:
 
 **Rich mode** — the default for anything non-trivial. Any element with a `review` attribute becomes a point; its content is whatever makes the judgment easiest — a paragraph, a table, a `mm.js` / `cy.js` diagram (load that script too). `title` is the short decidable statement; `topic` and `acts` sit on a wrapper and are inherited.
 

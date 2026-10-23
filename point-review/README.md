@@ -2,7 +2,7 @@
 
 Decide on many items at once. When Claude hands you 3+ things that each need a call — claims to accept or reject, options to keep or drop, a list to triage — this skill renders them as a widget: a button per row, an optional note per row, one overall comment, one Submit. Claude then acts on the whole batch.
 
-**Claude Chat (claude.ai) only** — it renders through the Visualizer (`show_widget`), which Claude Code and the API don't have.
+**Claude Chat (claude.ai), and Claude Code inside Projects** — it renders through an inline widget: the Visualizer (`show_widget`) in Chat, `post_widget` in Claude Code Projects. Plain Claude Code outside a Project and the API don't have one.
 
 [ภาษาไทย](#ภาษาไทย)
 
@@ -29,7 +29,7 @@ Requires Visualizer enabled. The widget itself is [`points.js`](https://github.c
 
 ตัดสินใจหลายข้อพร้อมกัน — เมื่อ Claude ส่งรายการ 3 ข้อขึ้นไปให้ตัดสิน (ยอมรับ/ปฏิเสธ เก็บ/ทิ้ง จัดลำดับ) สกิลนี้แสดงเป็นวิดเจ็ต: ปุ่มต่อแถว โน้ตต่อแถว ความเห็นรวมหนึ่งช่อง Submit ทีเดียว แล้ว Claude ทำตามทั้งชุด
 
-**ใช้ได้กับ Claude Chat (claude.ai) เท่านั้น** — แสดงผ่าน Visualizer (`show_widget`)
+**ใช้ได้กับ Claude Chat (claude.ai) และ Claude Code ที่อยู่ใน Project** — แสดงผ่าน inline widget: Visualizer (`show_widget`) ใน Chat, `post_widget` ใน Claude Code Project (Claude Code ที่ไม่อยู่ใน Project และ API ใช้ไม่ได้)
 
 ### วิธีใช้
 
