@@ -19,6 +19,10 @@ import urllib.error, urllib.request
 
 BOOTSTRAP = "https://data.iana.org/rdap/dns.json"
 
+# ccTLDs missing from IANA's bootstrap whose registry back-end answers RDAP
+# anyway (tested 26 Oct 2026: google.io/.sh/.ac -> 200, nophai.io -> 404).
+FALLBACK = {t: "https://rdap.identitydigital.services/rdap/" for t in ("io", "sh", "ac")}
+
 
 def ssl_context():
     # Sandboxes behind an egress proxy ship their own CA bundle.
@@ -43,7 +47,7 @@ def get(url):
 
 def load_servers():
     data = json.load(get(BOOTSTRAP))
-    servers = {}
+    servers = dict(FALLBACK)
     for tlds, urls in data["services"]:
         for tld in tlds:
             servers[tld.lower()] = urls[0].rstrip("/") + "/"

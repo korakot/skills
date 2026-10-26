@@ -26,7 +26,7 @@ python3 SKILL_DIR/scripts/check.py name1 name2 name3 -t com,dev,app,net
 python3 SKILL_DIR/scripts/check.py -f names.txt          # one name per line
 ```
 
-Bare names get every TLD; full domains are checked as given. Output is a grid, `✓` free and `✗` taken. The script reads registry endpoints from IANA's bootstrap file, retries rate limits, and accepts IDNs (โนภัย.com is sent as `xn--q3cog3d5d.com`). A `?noRDAP` TLD (e.g. .io) has to be checked at a registrar.
+Bare names get every TLD; full domains are checked as given. Output is a grid, `✓` free and `✗` taken. The script reads registry endpoints from IANA's bootstrap file, retries rate limits, and accepts IDNs (โนภัย.com is sent as `xn--q3cog3d5d.com`). .io, .sh and .ac are missing from IANA's file but the script knows their server. Any other `?noRDAP` TLD has to be checked at a registrar.
 
 When a short, obvious name comes back free, re-check it before celebrating: query it alone with `--raw`, and if DNS lookups work in your environment, confirm the name has no nameservers. bugsfound.com looked too good to be true; it was real, while its neighbours bugfound.com and foundbugs.com were taken.
 
