@@ -1,11 +1,11 @@
 ---
 name: fable-advisor
-description: Claude Code only. Consult Claude Fable through a fresh subagent that reads only a curated brief, from a session whose main model is below Fable (usually Opus). Use when the user says "ask Fable" or similar; before a costly-to-revert decision (architecture, schema, data or pipeline design, migration, an unattended loop or schedule); after two genuinely different failed fix attempts; or for a plan or pre-completion review of consequential work. Not for routine reversible work, for generation, or in sessions already running on Fable.
+description: Claude Code or Chat, wherever the Agent tool accepts model fable. Consult Claude Fable through a fresh subagent that reads only a curated brief, from a session whose main model is below Fable (usually Opus). Use when the user says "ask Fable" or similar; before a costly-to-revert decision (architecture, schema, data or pipeline design, migration, an unattended loop or schedule); after two genuinely different failed fix attempts; or for a plan or pre-completion review of consequential work. Not for routine reversible work, for generation, or in sessions already running on Fable.
 ---
 
 # Fable Advisor — a curated consult
 
-Fable is the scarce resource: on subscription plans it has its own, smaller weekly allowance, while the main model's tokens rarely run out. Claude Code's built-in `/advisor fable` sends Fable the whole transcript on every call, uncached. Here Fable is a fresh subagent that reads only the brief you write, plus the few files it chooses to open. So spend your own tokens freely on orientation and evidence, and spend Fable's on judgment only.
+Fable is the scarce resource: on premium subscription seats it draws from the shared weekly limit but may use at most half of it (Pro and standard seats pay usage credits for it), while the main model's tokens rarely run out. Claude Code's built-in `/advisor fable` sends Fable the whole transcript on every call, uncached. Here Fable is a fresh subagent that reads only the brief you write, plus the few files it chooses to open. So spend your own tokens freely on orientation and evidence, and spend Fable's on judgment only.
 
 **Fable supplies the judgment; you supply the tokens.** Fable decides or reviews; you explore, build, write and test. Never hand Fable generation work.
 
@@ -51,9 +51,11 @@ Use the Agent tool:
 
 - `subagent_type`: `general-purpose`. **Never a fork**: a fork copies the whole conversation, which is exactly what this skill avoids.
 - `model`: `"fable"`. A model passed on the call overrides defaults such as `CLAUDE_CODE_SUBAGENT_MODEL`.
-- `effort`: `"high"` where the tool accepts it. Fable 5.2 guidance is to start at high; `xhigh` spends more of the allowance for uneven gains.
+- `effort`: `"high"` where the tool accepts it (Chat's Agent tool does not). Fable 5.2 guidance is to start at high; `xhigh` spends more of the allowance for uneven gains.
 - Foreground (the verdict gates your next step).
 - `prompt`: the preamble below, then the brief.
+
+From Chat the spawn costs far more than in Claude Code: it inherits Chat's whole system prompt, memory snapshot and tool list (about 90k tokens for a 400-word brief, tested 11 Nov 2026; numbers in korakot/claude `wiki/advisor.md`). Keep Chat consults rare.
 
 Keep the agent's ID or name from the result: a follow-up goes by `SendMessage` with only the new information, never a re-brief. If the spawn fails or reports a model other than Fable (no Fable access, a consent prompt, an allowlist), tell the user rather than quietly consulting a weaker model.
 

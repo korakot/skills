@@ -12,10 +12,10 @@ Diff upstream's `plugins/fable-advisor/` between the "synced to" commit and its 
 
 ## Divergence (and why)
 
-1. **Claude Code only; the Codex route is dropped** (`references/codex-cli.md`, `agents/openai.yaml` removed). Kora consults Fable only from Claude Code.
+1. **Claude only; the Codex route is dropped** (`references/codex-cli.md`, `agents/openai.yaml` removed). Kora consults Fable from Claude Code; a Chat test on 11 Nov 2026 showed the same Agent-tool route also works from Chat, at a much higher context cost (korakot/claude `wiki/advisor.md`).
 2. **No separate agent definition; its system prompt becomes the preamble.** The skill is installed as a claude.ai profile skill, which syncs into cloud Claude Code sessions but carries no agent files, so upstream's fallback route (`general-purpose` + `model: "fable"` + preamble) is the only route. The preamble keeps the agent file's rules: read narrowly, commit, may reject the menu, weigh the orchestrator's evidence, no deliverables, the four-part answer under 300 words.
 3. **Effort `high`, not `xhigh`.** Anthropic's Fable 5.2 guidance: start at high; gains above it are uneven. The scarce resource is the Fable allowance.
-4. **Framed by the scarce allowance, not price.** On subscriptions Fable has its own smaller weekly cap while the main model rarely runs out, so the parent spends its own tokens freely on evidence. Also names the built-in `/advisor fable` (whole transcript, uncached) as what this replaces.
+4. **Framed by the scarce allowance, not price.** On premium subscription seats Fable draws from the shared weekly limit and may use at most half of it (support article "Claude Fable models on your plan", read 11 Nov 2026; corrected from "its own smaller weekly cap"), while the main model rarely runs out, so the parent spends its own tokens freely on evidence. Also names the built-in `/advisor fable` (whole transcript, uncached) as what this replaces.
 5. **Gate step 0: skip automatic consults when the main model is already Fable**, and **never fork** (a fork copies the whole conversation). Both are explicit because a cloud default like `CLAUDE_CODE_SUBAGENT_MODEL` or a fork would quietly undo the point.
 6. **Trigger 1 widened** beyond software (adds data-pipeline or dataset design and research method; drops n8n specifics), since Kora's Claude Code work includes data and research jobs.
 7. **Shorter.** Pricing figures and upstream-specific notes (named spawns inside subagents, plugin-installed agent names) removed; reporting back trimmed to one or two lines.
