@@ -1,203 +1,101 @@
 ---
 name: fable-advisor
-description: Consult Claude Fable for a compact strategic second opinion from Codex or Claude Code. Use before costly-to-revert architecture, schema, API, migration, or unattended-automation decisions; after two distinct failed fix attempts; for consequential plan or completion review; or when the user explicitly asks for Fable advice. Codex invokes claude -p with an explicit Fable model; Claude Code uses its native advisor agent. Covers compact evidence packets, three-interaction budgets, and weighing the verdict. Skip routine reversible edits and questions merely about Fable.
+description: Claude Code only. Consult Claude Fable through a fresh subagent that reads only a curated brief, from a session whose main model is below Fable (usually Opus). Use when the user says "ask Fable" or similar; before a costly-to-revert decision (architecture, schema, data or pipeline design, migration, an unattended loop or schedule); after two genuinely different failed fix attempts; or for a plan or pre-completion review of consequential work. Not for routine reversible work, for generation, or in sessions already running on Fable.
 ---
 
-# Fable Advisor — the expensive-consultant protocol
+# Fable Advisor — a curated consult
 
-You are a Codex or Claude Code orchestrator consulting Claude Fable. Keep the
-consult small: Fable supplies a verdict; the parent gathers evidence, builds, and
-verifies. Do not assume the parent is Opus or that a fixed price ratio applies to
-its model or subscription. The Codex CLI route pins `claude-fable-5-2`; the native
-Claude agent uses the host's `fable` alias. Use `xhigh` effort for consultations
-on both routes; preserve an explicit user model or effort choice.
+Fable is the scarce resource: on subscription plans it has its own, smaller weekly allowance, while the main model's tokens rarely run out. Claude Code's built-in `/advisor fable` sends Fable the whole transcript on every call, uncached. Here Fable is a fresh subagent that reads only the brief you write, plus the few files it chooses to open. So spend your own tokens freely on orientation and evidence, and spend Fable's on judgment only.
 
-The core principle, borrowed from Anthropic's advisor-tool design: **Fable supplies the
-judgment; you supply the tokens.** Fable decides or reviews; you explore, build, write,
-and test. Never hand Fable generation work.
+**Fable supplies the judgment; you supply the tokens.** Fable decides or reviews; you explore, build, write and test. Never hand Fable generation work.
 
-## The gate: two questions before every consult
+## The gate
 
-1. **Is this decision costly to revert, or am I genuinely stuck?** If a wrong call costs
-   under an hour of rework, decide yourself — you are a highly capable model; that is why
-   you are the orchestrator.
-2. **Is there a real fork in the road?** Fable adds value when there are competing options
-   with evidence to weigh, or a failure you can't explain. If you already know the answer
-   and want confirmation, that's a comfort consult — skip it.
+0. **Main model.** If this session already runs on Fable, there is nothing stronger to ask: skip automatic consults.
+1. **Is the decision costly to revert, or am I genuinely stuck?** If a wrong call costs under an hour of rework, decide yourself.
+2. **Is there a real fork in the road?** Fable adds value when competing options have evidence to weigh, or a failure doesn't fit your model of the problem. If you only want confirmation, skip it.
 
-If either answer is "no", skip an automatic consult. Honor an explicit request for
-a Fable second opinion even if the parent already runs on a premium model.
+If any answer says skip, decide yourself. An explicit request from the user ("ask Fable") bypasses the gate but not the budget.
 
 ## The five triggers
 
-Consult Fable when one of these fires — and orient first (read the key files, gather the
-constraints) so the briefing contains evidence. A consult without evidence buys generic
-advice at premium prices.
+Orient first (read the key files, gather the constraints) so the brief carries evidence; a consult without evidence buys generic advice.
 
-1. **Costly-to-revert decision, before building.** Architecture, DB schema, data models,
-   API and webhook contracts, n8n workflow topology (trigger strategy, batch-vs-event,
-   sub-workflow boundaries), queue-vs-single-instance, technology/vendor selection.
-   Timing: after orientation, before the first substantive write.
-2. **Stuck escalation.** Two or more *genuinely different* failed attempts, recurring
-   errors, or results that don't fit your model of the problem. Bring the failure
-   evidence — exact errors, what you tried, what each attempt disproved.
-3. **Plan review.** When you've drafted an implementation plan for a non-trivial task
-   (including in plan mode, before ExitPlanMode) and the plan embeds a costly-to-revert
-   choice, have Fable critique the draft before presenting it.
-4. **Pre-completion review.** Before declaring done on hard-to-revert deliverables:
-   production deploys, data migrations, anything client-facing. Include what was built,
-   how you verified it, and your specific residual worries.
-5. **Unattended-automation design.** Before starting a loop, schedule, or routine that
-   runs without a human watching — `/loop`, `/schedule`, `/goal` with a high turn cap,
-   cron-style agents, proactive workflows. A loop multiplies its design flaws: a bad
-   stop condition or interval doesn't fail once, it fails every iteration until someone
-   notices, and token spend scales with frequency × iterations. One review before it
-   starts is the cheapest point of intervention. Have Fable check: stop conditions
-   (deterministic and reachable?), trigger and interval (matched to how fast the
-   watched thing actually changes?), per-iteration verification, cost per iteration ×
-   frequency (model choice per stage — cheap models for mechanical work, judgment
-   escalated), blast radius (what it writes to external systems unattended;
-   idempotency, dedup/state between runs), and silent-failure modes (stalls, drift,
-   runaway growth).
+1. **Costly-to-revert decision, before building.** Architecture, schema and data models, API contracts, data-pipeline or dataset design, research method, technology choice. Timing: after orientation, before the first substantive write.
+2. **Stuck.** Two or more genuinely different failed attempts, recurring errors, or results that don't fit. Bring exact errors, what each attempt ruled out.
+3. **Plan review.** A drafted plan for a non-trivial task that embeds a costly-to-revert choice (in plan mode: before presenting it).
+4. **Pre-completion review.** Before declaring done on hard-to-revert work: production changes, data migrations, anything others will rely on. Include what was built, how it was verified, and your specific worries.
+5. **Unattended automation.** Before starting a loop, schedule or long autonomous job that acts without a human watching. Have Fable check stop conditions, interval against how fast the watched thing changes, per-run verification, cost per run × frequency, what it writes to outside systems, and silent-failure modes. Read-only polling that is cheap to cancel needs no review.
 
-## When NOT to consult
+## When not to consult
 
-- Easily reversed work: renames, refactors within a file, adding a flag, styling, copy.
-- Decisions already made — by the user, by repo convention, by AGENTS.md / CLAUDE.md, or by memory.
-- Routine implementation where the path is clear, however long it is.
-- Generation of any kind: code, documents, configs, workflows. If you're tempted to ask
-  Fable to "write" something, that's your job.
-- A first failed attempt. Try a genuinely different approach before escalating.
-- A low-stakes, easily-cancelled loop: read-only polling ("check deploy status every
-  5 min") needs no review — cancelling a loop is free. Consult only when the routine
-  acts on external systems unattended, or cost per iteration × frequency is material.
-- To offload thinking you haven't done yet. Fable amplifies a well-framed question and
-  wastes money on a vague one.
+- Easily reversed work: renames, local refactors, flags, styling, wording.
+- Decisions already made by the user, by repo convention, or by CLAUDE.md / AGENTS.md / memory.
+- Routine implementation with a clear path, however long.
+- Generation of any kind: code, documents, configs. That is your job.
+- A first failed attempt: try a genuinely different approach first.
+- Thinking you haven't done yet. Fable amplifies a well-framed question and wastes its allowance on a vague one.
 
-## Budget rules (hard)
+## Budget
 
-- **Default one consult per task. Hard cap: three executed Fable interactions per task**
-  (native spawns, CLI invocations, and follow-ups combined; attempts rejected before
-  model execution do not count).
-  Needing a fourth means the problem is misframed — say so to the user instead of
-  consulting again.
-- **Announce every consult** in one line before invoking, so the user sees the spend:
-  `Consulting Fable on <decision> (trigger: <which>, consult 1/3).`
-- **Batch questions.** If several decisions are pending in one task, one consult covering
-  all of them beats several small ones — the briefing context is shared.
-- **Cap the exchange.** One spawn plus at most one reconcile follow-up per question.
-  Fable is a consultant, not a pair-programming partner.
-- **Respect user overrides.** If the user says to skip Fable, or to always ask first,
-  that wins over this skill.
-- Never use Fable as the model for ordinary subagents (exploration, implementation,
-  review fan-outs). This advisory protocol does not restrict separately authorized Fable work.
+- **Default one consult per task; hard cap three Fable interactions** (spawns and follow-ups combined). Needing a fourth means the problem is misframed: say so to the user instead.
+- **Announce each consult** in one line before it: `Consulting Fable on <decision> (trigger: <which>, consult 1/3).`
+- **Batch** pending decisions into one consult.
+- **One spawn plus at most one follow-up per question.** Fable is a consultant, not a pair programmer.
+- The user's instructions win (skip Fable, always ask first, a different effort).
+- Never run ordinary subagents (exploration, implementation, review fan-outs) on Fable under this skill.
 
 ## How to consult
 
-Route by the parent host:
+Use the Agent tool:
 
-- **Codex:** use `claude -p`, not a Codex native sub-agent with a Claude model name.
-  Read [the Codex CLI route](references/codex-cli.md) for the exact command, tool
-  isolation, result checks, and fresh-invocation follow-ups. No Claude plugin install
-  is required: the skill folder contains everything needed to construct the brief.
-- **Claude Code:** use the native agent below. The `fable` alias is host-configurable;
-  record the actual model when available and honor explicit version requests.
+- `subagent_type`: `general-purpose`. **Never a fork**: a fork copies the whole conversation, which is exactly what this skill avoids.
+- `model`: `"fable"`. A model passed on the call overrides defaults such as `CLAUDE_CODE_SUBAGENT_MODEL`.
+- `effort`: `"high"` where the tool accepts it. Fable 5.2 guidance is to start at high; `xhigh` spends more of the allowance for uneven gains.
+- Foreground (the verdict gates your next step).
+- `prompt`: the preamble below, then the brief.
 
-### Claude Code native agent
+Keep the agent's ID or name from the result: a follow-up goes by `SendMessage` with only the new information, never a re-brief. If the spawn fails or reports a model other than Fable (no Fable access, a consent prompt, an allowlist), tell the user rather than quietly consulting a weaker model.
 
-Preferred — the dedicated advisor agent (read-only tools, verdict-format discipline
-built into its system prompt, `effort: xhigh` in its definition):
+**Preamble** (prepend verbatim):
 
-```
-Agent(
-  subagent_type: "fable-advisor",     # plugin-installed form: "fable-advisor:fable-advisor"
-  name: "fable-consult-1",            # so you can SendMessage a follow-up
-  description: "Fable consult: <topic>",
-  prompt: <briefing packet — see below>,
-  run_in_background: false            # the verdict blocks your next step
-)
-```
+> You are a one-shot strategic advisor to a capable orchestrator that does all the building itself. Supply judgment, not artifacts: no code beyond a 10-line sketch, no documents or configs, and do not edit files or run commands that change anything. The brief should usually suffice; if a load-bearing fact is missing, read the named files narrowly (grep, targeted ranges), never explore the whole repository; if something crucial is still missing, name the gap instead of guessing. Commit: if it genuinely depends, say on what and give the decision rule. You may reject the menu and name a better option; that is the most valuable outcome. Weigh the orchestrator's first-hand evidence over your priors. Answer with **Verdict** (1–3 committed sentences) → **Why** (load-bearing reasons only) → **Risks** (top 2–3 of your own recommendation) → **Would change my mind** (1–2 specific pieces of evidence). Under 300 words; no preamble, no restating the brief. Your final message is the deliverable.
 
-If the spawn is rejected because of the `name` parameter (this happens when you are
-yourself a subagent — named spawns are top-level-only), retry the same call without
-`name`; follow-ups then need a fresh spawn carrying a one-paragraph recap instead of
-SendMessage. A rejected spawn that never executed does not count against the budget.
+## The brief
 
-Fallback — if neither `fable-advisor` nor `fable-advisor:fable-advisor` is in the
-available agent list, spawn
-`general-purpose` with `model: "fable"` and an explicit host-supported `xhigh`
-effort setting. If the spawn schema cannot set effort, use a custom read-only
-agent definition with `effort: xhigh`; do not assume the parent effort or a prompt
-request changes the runtime setting. Prepend this preamble to the briefing:
-
-> You are a one-shot strategic advisor to a capable orchestrator that does all the
-> building itself. Supply judgment, not artifacts: no code beyond 10-line sketches, no
-> documents. Answer with: **Verdict** (1–3 committed sentences) → **Why** (load-bearing
-> reasons only) → **Risks** (top 2–3 of your recommendation) → **Would change my mind**
-> (1–2 specific pieces of evidence). Stay under 300 words. Only read the named files,
-> and narrowly, if the briefing is insufficient. Your final message is the deliverable.
-
-Follow-ups: `SendMessage` to the named agent — its context is intact, so send only the
-new information, never a re-briefing.
-
-## The briefing packet
-
-Curate the briefing rather than forwarding the parent transcript. Aim for 800 words,
-with a 1,200-word ceiling including excerpts. Native advisors can read named files
-narrowly. The default Codex CLI route has no tools: include decisive excerpts and
-label paths as evidence citations, not requests to open files. Runtime system
-context may still be added; a fresh process is not a zero-overhead prompt.
+Curate; never forward the transcript. Aim for about 800 words, 1,200 at most including excerpts.
 
 ```
-DECISION: <the question, one sentence, first line>
+DECISION: <the question in one sentence, first line>
 
-CONTEXT: <2–4 sentences: what's being built, for whom, where it runs>
+CONTEXT: <2–4 sentences: what is being built or studied, for whom, where it runs>
 
 OPTIONS:
-  A. <option> — <main pro / main con as you see it>
+  A. <option> — <main pro / main con>
   B. <option> — <...>
-  My leaning: <X, because Y>          # always state a leaning; it sharpens the advice
+  My leaning: <X, because Y>          # always state one; it sharpens the advice
 
-CONSTRAINTS: <the hard ones only: budget, existing infra, rate limits, deadline, team>
+CONSTRAINTS: <the hard ones only>
 
-EVIDENCE: <the facts that matter: key excerpts, numbers, exact error output,
-           what failed attempts disproved>
+EVIDENCE: <the facts that matter: key excerpts, numbers, exact errors,
+           what failed attempts ruled out>
 
-FILES (native: read narrowly if needed; tools-disabled CLI: citations only):
-  <path> — <one line on what's in it and why it's relevant>   # ≤5 files
+FILES (read narrowly only if needed):
+  <path> — <what is in it and why it matters>   # at most 5
 
 ANSWER FORMAT: Verdict first, then top risks, then what would change your mind.
 Under 300 words.
 ```
 
-For **stuck escalation**, replace OPTIONS with ATTEMPTS (what you tried, exact result,
-what each ruled out). For **pre-completion review**, replace OPTIONS with WHAT WAS BUILT
-+ HOW VERIFIED + SPECIFIC WORRIES. For **loop/schedule design**, replace OPTIONS with
-LOOP DESIGN: the trigger and interval, the prompt each run executes, stop criteria,
-per-iteration verification, model and turn caps, expected cost per iteration, and every
-external system it touches unattended.
-
-Always state the decision in the first line and always request the answer format —
-output is the consult's biggest cost driver, and Anthropic's testing showed capping
-advisor output ~7× lost no measurable quality.
+For **stuck**, replace OPTIONS with ATTEMPTS (what you tried, the exact result, what each ruled out). For **pre-completion review**, replace OPTIONS with WHAT WAS BUILT + HOW VERIFIED + SPECIFIC WORRIES. For **automation design**, replace OPTIONS with the design: trigger and interval, what each run does, stop criteria, per-run checks, model and turn caps, cost per run, and every outside system it touches.
 
 ## Treating the advice
 
-- **Give it serious weight** — it's what you paid for. Don't relitigate it internally
-  without new evidence.
-- **Empirical evidence beats advice.** If you follow a recommendation and it fails
-  against reality (the file says X, the API returns Y), adapt. But a passing self-test
-  is not evidence the advice was wrong — it may check something your test doesn't.
-- **Conflicts get one reconcile call, not a silent switch.** If your evidence points one
-  way and Fable points another, send the named native advisor one focused follow-up,
-  or make one fresh CLI invocation with the prior verdict and new evidence. Ask which
-  constraint breaks the tie. Count either route within the same interaction cap.
-- **Fable can reject the menu.** If it says all your options are bad and names a better
-  one, take that seriously — it's the highest-value outcome a consult can produce.
+- **Give it serious weight.** Don't relitigate it without new evidence.
+- **Reality beats advice.** If a recommendation fails against the facts (the file says X, the API returns Y), adapt. A passing self-test is not proof the advice was wrong.
+- **A conflict gets one follow-up, not a silent switch.** Send the same agent the new evidence and ask which constraint breaks the tie; it counts toward the cap.
+- **Fable may reject the menu.** Take that seriously.
 
 ## Reporting back
 
-In your final message to the user, include: that Fable was consulted (and how many
-times), its verdict in one or two sentences, and whether you followed it — with the
-reason if you didn't. The user is paying for these consults; they should always be able
-to see what they bought.
+Tell the user, briefly: that Fable was consulted (how many times), its verdict in one or two sentences, and whether you followed it, with the reason if not.
