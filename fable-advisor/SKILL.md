@@ -1,11 +1,11 @@
 ---
 name: fable-advisor
-description: Claude Code or Chat, wherever the Agent tool accepts model fable. Consult Claude Fable through a fresh subagent that reads only a curated brief, from a session whose main model is below Fable (usually Opus). Use when the user says "ask Fable" or similar; before a costly-to-revert decision (architecture, schema, data or pipeline design, migration, an unattended loop or schedule); after two genuinely different failed fix attempts; or for a plan or pre-completion review of consequential work. Not for routine reversible work, for generation, or in sessions already running on Fable.
+description: Consult Claude Fable through a one-shot headless call that reads only a curated brief, from a session whose main model is below Fable (usually Opus). Works wherever the claude CLI is logged in (cloud Claude Code, the Chat sandbox), with an Agent-tool subagent as the fallback. Use when the user says "ask Fable" or similar; before a costly-to-revert decision (architecture, schema, data or pipeline design, migration, an unattended loop or schedule); after two genuinely different failed fix attempts; or for a plan or pre-completion review of consequential work. Not for routine reversible work, for generation, or in sessions already running on Fable.
 ---
 
 # Fable Advisor — a curated consult
 
-Fable is the scarce resource: on premium subscription seats it draws from the shared weekly limit but may use at most half of it (Pro and standard seats pay usage credits for it), while the main model's tokens rarely run out. Claude Code's built-in `/advisor fable` sends Fable the whole transcript on every call, uncached. Here Fable is a fresh subagent that reads only the brief you write, plus the few files it chooses to open. So spend your own tokens freely on orientation and evidence, and spend Fable's on judgment only.
+Fable is the scarce resource: on premium subscription seats it draws from the shared weekly limit but may use at most half of it (Pro and standard seats pay usage credits for it), while the main model's tokens rarely run out. Claude Code's built-in `/advisor fable` sends Fable the whole transcript on every call, uncached. Here Fable runs as a separate one-shot `claude -p` process that reads only the preamble and the brief you write: about 2.5k input tokens in cloud Claude Code, against about 63k for an Agent-tool subagent there and about 90k in Chat, because a subagent carries the session's memory, skill list and tools (measured 11 Nov 2026). So spend your own tokens freely on orientation and evidence, and spend Fable's on judgment only.
 
 **Fable supplies the judgment; you supply the tokens.** Fable decides or reviews; you explore, build, write and test. Never hand Fable generation work.
 
@@ -47,25 +47,24 @@ Orient first (read the key files, gather the constraints) so the brief carries e
 
 ## How to consult
 
-Use the Agent tool:
+**Default: headless.** Write the brief to a file (scratchpad), then run the bundled script with a Bash timeout of about 6 minutes:
 
-- `subagent_type`: `general-purpose`. **Never a fork**: a fork copies the whole conversation, which is exactly what this skill avoids.
-- `model`: `"fable"`. A model passed on the call overrides defaults such as `CLAUDE_CODE_SUBAGENT_MODEL`.
-- `effort`: `"high"` where the tool accepts it (Chat's Agent tool does not). Fable 5.2 guidance is to start at high; `xhigh` spends more of the allowance for uneven gains.
-- Foreground (the verdict gates your next step).
-- `prompt`: the preamble below, then the brief.
+```bash
+python3 <this skill's folder>/scripts/consult.py <brief-file>
+```
 
-From Chat the spawn costs far more than in Claude Code: it inherits Chat's whole system prompt, memory snapshot and tool list (about 90k tokens for a 400-word brief, tested 11 Nov 2026; numbers in korakot/claude `wiki/advisor.md`). Keep Chat consults rare.
+It calls `claude -p --model fable --effort high --safe-mode --tools '' --system-prompt <preamble.txt>` with the brief on stdin, no session persistence, one turn and a $1 cap, then checks that the JSON result is a success and that the output came from a Fable model. It prints the verdict and one usage line (model, input, output, cost, time).
 
-Keep the agent's ID or name from the result: a follow-up goes by `SendMessage` with only the new information, never a re-brief. If the spawn fails or reports a model other than Fable (no Fable access, a consent prompt, an allowlist), tell the user rather than quietly consulting a weaker model.
+- **Exit 0:** the verdict. **Exit 2:** failed or not Fable: report it to the user, do not retry, do not swap models. **Exit 3:** the CLI is missing or not logged in: use the fallback below.
+- Fable has **no tools** on this route, so the brief must carry the evidence: paste **verbatim excerpts** of load-bearing facts, not paraphrase; file paths are citations only.
+- **Follow-up:** there is no session to resume. Make one fresh call with a short recap, Fable's previous verdict, and only the new evidence; it counts toward the cap.
+- The user may ask for another effort or model (`--effort xhigh`, `--model claude-fable-5-1`).
 
-**Preamble** (prepend verbatim):
-
-> You are a one-shot strategic advisor to a capable orchestrator that does all the building itself. Supply judgment, not artifacts: no code beyond a 10-line sketch, no documents or configs, and do not edit files or run commands that change anything. The brief should usually suffice; if a load-bearing fact is missing, read the named files narrowly (grep, targeted ranges), never explore the whole repository; if something crucial is still missing, name the gap instead of guessing. Commit: if it genuinely depends, say on what and give the decision rule. You may reject the menu and name a better option; that is the most valuable outcome. Weigh the orchestrator's first-hand evidence over your priors. Answer with **Verdict** (1–3 committed sentences) → **Why** (load-bearing reasons only) → **Risks** (top 2–3 of your own recommendation) → **Would change my mind** (1–2 specific pieces of evidence). Under 300 words; no preamble, no restating the brief. Your final message is the deliverable.
+**Fallback: Agent tool** (only on exit 3; announce it, since it costs roughly 25× the input, more in Chat). `subagent_type: general-purpose`, `model: "fable"` (a per-call model overrides defaults such as `CLAUDE_CODE_SUBAGENT_MODEL`), `effort: "high"` where the tool takes it (Chat's does not), foreground, prompt = the contents of `preamble.txt` + the brief. **Never a fork**: a fork copies the whole conversation. Follow-ups go to the same agent by `SendMessage`, new information only. If it reports a model other than Fable, tell the user.
 
 ## The brief
 
-Curate; never forward the transcript. Aim for about 800 words, 1,200 at most including excerpts.
+Curate; never forward the transcript. Aim for about 800 words, 1,200 at most including excerpts. Your own tokens are cheap: spend them on finding the right excerpts.
 
 ```
 DECISION: <the question in one sentence, first line>
@@ -82,7 +81,7 @@ CONSTRAINTS: <the hard ones only>
 EVIDENCE: <the facts that matter: key excerpts, numbers, exact errors,
            what failed attempts ruled out>
 
-FILES (read narrowly only if needed):
+FILES (citations; Fable cannot open them on the default route):
   <path> — <what is in it and why it matters>   # at most 5
 
 ANSWER FORMAT: Verdict first, then top risks, then what would change your mind.
@@ -95,7 +94,7 @@ For **stuck**, replace OPTIONS with ATTEMPTS (what you tried, the exact result, 
 
 - **Give it serious weight.** Don't relitigate it without new evidence.
 - **Reality beats advice.** If a recommendation fails against the facts (the file says X, the API returns Y), adapt. A passing self-test is not proof the advice was wrong.
-- **A conflict gets one follow-up, not a silent switch.** Send the same agent the new evidence and ask which constraint breaks the tie; it counts toward the cap.
+- **A conflict gets one follow-up, not a silent switch.** One fresh call with the recap, the verdict and the new evidence; ask which constraint breaks the tie. It counts toward the cap.
 - **Fable may reject the menu.** Take that seriously.
 
 ## Reporting back
